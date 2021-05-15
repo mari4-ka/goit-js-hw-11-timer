@@ -18,10 +18,11 @@ class CountdownTimer {
 
   intervalID = setInterval(() => {
     const currentTime = Date.now();
-    console.log(currentTime);
+    // console.log(currentTime);
     const deltaTime = this.targetDate.getTime() - currentTime;
-    console.log(deltaTime)
+    // console.log(deltaTime);
     this.getTimeComponents(deltaTime);
+    this.timerFinished(deltaTime);
   }, 1000);
 
   pad(value) {
@@ -37,10 +38,9 @@ class CountdownTimer {
     return refs.clockface.textContent = `${days}:${hours}:${mins}:${secs}`;
   }
 
-
-  timerFinished(time) {
-    if (time < 0) {
-      clearInterval(this.setInterval);
+  timerFinished(deltaTime) {
+    if (deltaTime < 0) {
+      clearInterval(this.intervalID);
       refs.clockface.textContent = "Timer is finished";
     }
   }
@@ -48,5 +48,5 @@ class CountdownTimer {
 
 new CountdownTimer({
   selector: '#timer-1',
-  targetDate: new Date('Jul 17, 2021'),
+  targetDate: new Date('May 20, 2021'),
 });  
