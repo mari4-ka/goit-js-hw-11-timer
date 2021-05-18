@@ -1,11 +1,5 @@
-"use strict"
-
 const refs = {
   clockface: document.querySelector('#timer-1'),
-  days: document.querySelector('[data-value="days"]'),
-  hours: document.querySelector('[data-value="hours"]'),
-  mins: document.querySelector('[data-value="mins"]'),
-  secs: document.querySelector('[data-value="secs"]'),
 }
 
 class CountdownTimer {
@@ -14,39 +8,54 @@ class CountdownTimer {
     this.intervalID = null;
     this.selector = selector;
     this.targetDate = targetDate;
+    this.startTimer();
+    this.init();
   }
 
-  intervalID = setInterval(() => {
-    const currentTime = Date.now();
-    // console.log(currentTime);
-    const deltaTime = this.targetDate.getTime() - currentTime;
-    // console.log(deltaTime);
-    this.getTimeComponents(deltaTime);
-    this.timerFinished(deltaTime);
-  }, 1000);
-
-  pad(value) {
-    return String(value).padStart(2, '0');
+  init() {
+    const time = this.getTimeComponents(0);
+    this.updateTime(time);
   }
 
+  startTimer() {
+    this.intervalID = setInterval(() => {
+      const currentTime = Date.now();
+      const deltaTime = this.targetDate - currentTime;
+      const time = this.getTimeComponents(deltaTime);
+      this.updateTime(time);
+
+      if (deltaTime < 0) {
+        clearInterval(this.intervalID);
+        this.init();
+        refs.clockface.textContent = "Timer is finished";
+        return;
+      }
+    }, 1000);
+  }
+
+  updateTime({ days, hours, mins, secs }) {
+    refs.clockface.textContent = `${days}:${hours}:${mins}:${secs}`;
+  }
+   
   getTimeComponents(time) {
     const days = this.pad(Math.floor(time / (1000 * 60 * 60 * 24)));
     const hours = this.pad(Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),);
     const mins = this.pad(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)));
     const secs = this.pad(Math.floor((time % (1000 * 60)) / 1000));
-
-    return refs.clockface.textContent = `${days}:${hours}:${mins}:${secs}`;
+    
+    return { days, hours, mins, secs };
   }
 
-  timerFinished(deltaTime) {
-    if (deltaTime < 0) {
-      clearInterval(this.intervalID);
-      refs.clockface.textContent = "Timer is finished";
-    }
+  pad(value) {
+  return String(value).padStart(2, '0');
   }
 }
 
-new CountdownTimer({
+const timer = new CountdownTimer({
   selector: '#timer-1',
   targetDate: new Date('May 20, 2021'),
-});  
+  // targetDate: new Date('May 10, 2021'),
+
+});
+
+timer.startTimer();
